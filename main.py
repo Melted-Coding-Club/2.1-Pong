@@ -1,152 +1,121 @@
 # importing libraries
-import random
-
 import pygame
-
-global event
+import random
+import math
 
 # Initialising pygame
 pygame.init()
+font = pygame.font.SysFont("arial", 25)
 
-# defining colors
-black = pygame.Color(0, 0, 0)
-white = pygame.Color(255, 255, 255)
-red = pygame.Color(255, 0, 0)
-green = pygame.Color(0, 255, 0)
-blue = pygame.Color(0, 0, 255)
-
-font = pygame.font.SysFont("bahnschrift", 25)
-
-# Window size
-window_x, window_y = 800, 600
-game_window = pygame.display.set_mode((window_x, window_y))
+# Window setup
+screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption('Pong')
+clock = pygame.time.Clock()
 fps = 60
-overMessage = "GAME OVER!"
 
-gameOver = False
+# Ball settings
+ball_speed = 5
+ball_angle = random.choice([math.radians(random.randint(-45, 45)), math.radians(random.randint(135, 225))])
+ball_radius = 10
+ball_centre = [screen.get_width() // 2, screen.get_height() // 2]
+ball_speed_increment = 0.2
 
-paddleWidth = 10
-paddleHieght = 90
-paddleDist = 30
+# Paddle settings
+paddle_width = 10
+paddle_height = 90
+paddle_dist = 30
 
-ballRadius = 10
-ballCentre = [window_x//2, window_y//2]
-player1 = pygame.Rect([paddleDist, window_y // 2 - paddleHieght // 2, paddleWidth, paddleHieght])
-player2 = pygame.Rect([window_x - paddleDist, window_y // 2 - paddleHieght // 2, paddleWidth, paddleHieght])
-
+# Player settings
 player_speed = 5
+player1 = pygame.Rect(paddle_dist, screen.get_height() // 2 - paddle_height // 2, paddle_width, paddle_height)
+player2 = pygame.Rect(screen.get_width() - paddle_dist - paddle_width, screen.get_height() // 2 - paddle_height // 2, paddle_width, paddle_height)
 
-move_p1 = 0
-move_p2 = 0
-
-move_ballX = 5
-move_ballY = 0
-# Speed is multiplied by this number
-ballSpeedMulti = 1
-# Adds this much to the ballSpeedMulti everytime the ball touches a paddle
-ballSpeedMultiIncrease = 0.02
-# a number between neg and pos this value is added to y ball movement
-randomness = 1.5
-# Max move_ballY
-maxY = 4.5
+# Scores
+player1_score = 0
+player2_score = 0
 
 def reset():
-    global gameOver, ballCentre, move_p1, move_p2, move_ballX, move_ballY, ballSpeedMulti, ballSpeedMultiIncrease, player1, player2
-    ballCentre = [window_x // 2, window_y // 2]
-
-    player1 = pygame.Rect([paddleDist, window_y // 2 - paddleHieght // 2, paddleWidth, paddleHieght])
-    player2 = pygame.Rect([window_x - paddleDist, window_y // 2 - paddleHieght // 2, paddleWidth, paddleHieght])
-
-    move_p1 = 0
-    move_p2 = 0
-    move_ballX = 5
-    move_ballY = 0
-    ballSpeedMulti = 1
-    gameOver = False
+    global ball_centre, ball_angle, ball_speed, game_over, player1, player2
+    ball_centre = [screen.get_width() // 2, screen.get_height() // 2]
+    ball_speed = 5
+    ball_angle = random.choice([math.radians(random.randint(-45, 45)), math.radians(random.randint(135, 225))])
+    player1.topleft = (paddle_dist, screen.get_height() // 2 - paddle_height // 2)
+    player2.topleft = (screen.get_width() - paddle_dist, screen.get_height() // 2 - paddle_height // 2)
+    game_over = False
 
 
+game_over = False
 while True:
-    while gameOver:
+    if game_over:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    pygame.quit()
-                    quit()
-                elif event.key == pygame.K_SPACE:
-                    reset()
-        overMsg = font.render(overMessage, True, red)
-        game_window.blit(overMsg,
-                         [(window_x // 2) - (overMsg.get_width() // 2), (window_y // 2) - (overMsg.get_height() // 2)])
-        pygame.display.update()
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                reset()
+        over_msg = font.render("Game Over", True, "red")
+        screen.blit(over_msg, [(screen.get_width() // 2) - (over_msg.get_width() // 2), (screen.get_height() // 2) - (over_msg.get_height() // 2)])
+        pygame.display.flip()
+        continue
 
+    # Event handling
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             quit()
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:
-                pygame.quit()
-                quit()
-            if event.key == pygame.K_w:
-                move_p1 = -player_speed
-            elif event.key == pygame.K_s:
-                move_p1 = player_speed
-            if event.key == pygame.K_UP:
-                move_p2 = -player_speed
-            elif event.key == pygame.K_DOWN:
-                move_p2 = player_speed
-        if event.type == pygame.KEYUP:
-            if event.key == pygame.K_w:
-                move_p1 = 0
-            elif event.key == pygame.K_s:
-                move_p1 = 0
-            if event.key == pygame.K_UP:
-                move_p2 = 0
-            elif event.key == pygame.K_DOWN:
-                move_p2 = 0
 
-    player1.y = player1.y + move_p1
-    if player1.top <= 0:
-        player1.top = 0
-    if player1.bottom >= window_y:
-        player1.bottom = window_y
+    # Player controls
+    pressed_keys = pygame.key.get_pressed()
+    if pressed_keys[pygame.K_w]:
+        player1.y -= player_speed
+    if pressed_keys[pygame.K_s]:
+        player1.y += player_speed
+    if pressed_keys[pygame.K_UP]:
+        player2.y -= player_speed
+    if pressed_keys[pygame.K_DOWN]:
+        player2.y += player_speed
 
-    player2.y = player2.y + move_p2
-    if player2.top <= 0:
-        player2.top = 0
-    if player2.bottom >= window_y:
-        player2.bottom = window_y
+    # Keep paddles within screen bounds
+    for player in [player1, player2]:
+        if player.top < 0:
+            player.top = 0
+        if player.bottom > screen.get_height():
+            player.bottom = screen.get_height()
 
-    ballCentre[0] = ballCentre[0] + move_ballX * ballSpeedMulti
-    ballCentre[1] = ballCentre[1] + move_ballY
-    ball_rect = pygame.Rect(ballCentre[0] - ballRadius, ballCentre[1] - ballRadius, ballRadius * 2, ballRadius * 2)
+    # Ball movement
+    ball_centre[0] = ball_centre[0] + math.cos(ball_angle) * ball_speed
+    ball_centre[1] = ball_centre[1] + math.sin(ball_angle) * ball_speed
 
-    if ball_rect.colliderect(player1) or ball_rect.colliderect(player2):
-        move_ballX = -move_ballX
-        ballSpeedMulti += ballSpeedMultiIncrease
-        move_ballY = move_ballY + random.uniform(-randomness, randomness)
-        if move_ballY > maxY:
-            move_ballY = maxY
-        elif move_ballY < -maxY:
-            move_ballY = -maxY
+    ball_rect = pygame.Rect(ball_centre[0] - ball_radius, ball_centre[1] - ball_radius, ball_radius * 2, ball_radius * 2)
 
-    if ball_rect.top <= 0 or ball_rect.bottom >= window_y:
-        move_ballY = -move_ballY
+    # Ball collision with paddles
+    if ((ball_rect.colliderect(player1) and math.cos(ball_angle) < 0)
+            or (ball_rect.colliderect(player2) and math.cos(ball_angle) > 0)):
+        ball_angle = math.pi - ball_angle
+        ball_speed += ball_speed_increment
 
-    if ball_rect.centerx < 0 or ball_rect.centerx > window_x:
-        gameOver = True
+    # Ball collision with top/bottom walls
+    if ball_rect.top <= 0 or ball_rect.bottom >= screen.get_height():
+        ball_angle = math.pi * 2 - ball_angle
 
-    print(move_ballY)
+    # Scoring system
+    if ball_rect.left <= 0:
+        player2_score += 1
+        game_over = True
+    elif ball_rect.right >= screen.get_width():
+        player1_score += 1
+        game_over = True
 
-    game_window.fill(black)
-    pygame.draw.circle(game_window, red, ballCentre, ballRadius)
-    pygame.draw.rect(game_window, blue, player1)
-    pygame.draw.rect(game_window, green, player2)
+    # Rendering
+    screen.fill("black")
+    pygame.draw.circle(screen, "red", ball_centre, ball_radius)
+    pygame.draw.rect(screen, "blue", player1)
+    pygame.draw.rect(screen, "green", player2)
 
-    pygame.display.update()
+    # Display scores
+    score_text = font.render(f"{player1_score}  -  {player2_score}", True, "white")
+    screen.blit(score_text, [(screen.get_width() // 2) - 20, 20])
 
-    pygame.time.Clock().tick(fps)
+    # Update Screen
+    pygame.display.flip()
+    clock.tick(fps)
