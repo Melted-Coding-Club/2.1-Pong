@@ -58,7 +58,6 @@ while True:
     pygame.draw.rect(screen, "blue", player1)
     pygame.draw.rect(screen, "green", player2)
 
-
     # Update Screen
     pygame.display.flip()
     clock.tick(fps)
