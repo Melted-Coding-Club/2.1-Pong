@@ -52,12 +52,27 @@ while True:
         if player.bottom > screen.get_height():
             player.bottom = screen.get_height()
 
+    # Ball movement
+    ball_centre[0] = ball_centre[0] + math.cos(ball_angle) * ball_speed
+    ball_centre[1] = ball_centre[1] + math.sin(ball_angle) * ball_speed
+
+    ball_rect = pygame.Rect(ball_centre[0] - ball_radius, ball_centre[1] - ball_radius, ball_radius * 2, ball_radius * 2)
+
+    # Ball collision with paddles
+    if ((ball_rect.colliderect(player1) and math.cos(ball_angle) < 0)
+            or (ball_rect.colliderect(player2) and math.cos(ball_angle) > 0)):
+        ball_angle = math.pi - ball_angle
+        ball_speed += ball_speed_increment
+
+    # Ball collision with top/bottom walls
+    if ball_rect.top <= 0 or ball_rect.bottom >= screen.get_height():
+        ball_angle = math.pi * 2 - ball_angle
+
     # Rendering
     screen.fill("black")
     pygame.draw.circle(screen, "red", ball_centre, ball_radius)
     pygame.draw.rect(screen, "blue", player1)
     pygame.draw.rect(screen, "green", player2)
-
 
     # Update Screen
     pygame.display.flip()
