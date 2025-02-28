@@ -3,6 +3,7 @@ import math
 import pygame
 
 pygame.init()
+font = pygame.font.SysFont("arial", 25)  # This font variable will be used to write on the screen using pygame.font.render
 
 # Window setup
 screen = pygame.display.set_mode((800, 600))
@@ -27,7 +28,18 @@ player_speed = 5
 player1 = pygame.Rect(paddle_dist, screen.get_height() // 2 - paddle_height // 2, paddle_width, paddle_height)
 player2 = pygame.Rect(screen.get_width() - paddle_dist - paddle_width, screen.get_height() // 2 - paddle_height // 2, paddle_width, paddle_height)
 
+game_over = False
 while True:
+    if game_over:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+        over_msg = font.render("Game Over", True, "red")
+        screen.blit(over_msg, [(screen.get_width() // 2) - (over_msg.get_width() // 2), (screen.get_height() // 2) - (over_msg.get_height() // 2)])
+        pygame.display.flip()
+        continue
+
     # Event handling
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -67,6 +79,12 @@ while True:
     # Ball collision with top/bottom walls
     if ball_rect.top <= 0 or ball_rect.bottom >= screen.get_height():
         ball_angle = math.pi * 2 - ball_angle
+
+    # Scoring system
+    if ball_rect.left <= 0:
+        game_over = True
+    elif ball_rect.right >= screen.get_width():
+        game_over = True
 
     # Rendering
     screen.fill("black")
