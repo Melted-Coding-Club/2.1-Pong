@@ -3,7 +3,7 @@ import math
 import pygame
 
 pygame.init()
-font = pygame.font.SysFont("arial", 25)  # This font variable will be used to write on the screen using pygame.font.render
+font = pygame.font.SysFont("arial", 25)
 
 # Window setup
 screen = pygame.display.set_mode((800, 600))
@@ -28,6 +28,16 @@ player_speed = 5
 player1 = pygame.Rect(paddle_dist, screen.get_height() // 2 - paddle_height // 2, paddle_width, paddle_height)
 player2 = pygame.Rect(screen.get_width() - paddle_dist - paddle_width, screen.get_height() // 2 - paddle_height // 2, paddle_width, paddle_height)
 
+def reset():
+    global ball_centre, ball_angle, ball_speed, game_over, player1, player2
+    ball_centre = [screen.get_width() // 2, screen.get_height() // 2]
+    ball_speed = 5
+    ball_angle = random.choice([math.radians(random.randint(-45, 45)), math.radians(random.randint(135, 225))])
+    player1.topleft = (paddle_dist, screen.get_height() // 2 - paddle_height // 2)
+    player2.topleft = (screen.get_width() - paddle_dist, screen.get_height() // 2 - paddle_height // 2)
+    game_over = False
+
+
 game_over = False
 while True:
     if game_over:
@@ -35,6 +45,8 @@ while True:
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                reset()
         over_msg = font.render("Game Over", True, "red")
         screen.blit(over_msg, [(screen.get_width() // 2) - (over_msg.get_width() // 2), (screen.get_height() // 2) - (over_msg.get_height() // 2)])
         pygame.display.flip()
