@@ -1,3 +1,5 @@
+import random
+import math
 import pygame
 
 pygame.init()
@@ -7,6 +9,13 @@ screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption('Pong')
 clock = pygame.time.Clock()
 fps = 60
+
+# Ball settings
+ball_speed = 5
+ball_angle = random.choice([math.radians(random.randint(-45, 45)), math.radians(random.randint(135, 225))])
+ball_radius = 10
+ball_centre = [screen.get_width() // 2, screen.get_height() // 2]
+ball_speed_increment = 0.2
 
 # Paddle settings
 paddle_width = 10
@@ -45,8 +54,10 @@ while True:
 
     # Rendering
     screen.fill("black")
+    pygame.draw.circle(screen, "red", ball_centre, ball_radius)
     pygame.draw.rect(screen, "blue", player1)
     pygame.draw.rect(screen, "green", player2)
+
 
     # Update Screen
     pygame.display.flip()
