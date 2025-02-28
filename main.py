@@ -26,6 +26,17 @@ while True:
             pygame.quit()
             quit()
 
+    # Player controls
+    pressed_keys = pygame.key.get_pressed()
+    if pressed_keys[pygame.K_w]:
+        player1.y -= player_speed
+    if pressed_keys[pygame.K_s]:
+        player1.y += player_speed
+    if pressed_keys[pygame.K_UP]:
+        player2.y -= player_speed
+    if pressed_keys[pygame.K_DOWN]:
+        player2.y += player_speed
+
     # Rendering
     screen.fill("black")
     pygame.draw.rect(screen, "blue", player1)
