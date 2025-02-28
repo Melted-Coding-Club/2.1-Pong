@@ -28,6 +28,10 @@ player_speed = 5
 player1 = pygame.Rect(paddle_dist, screen.get_height() // 2 - paddle_height // 2, paddle_width, paddle_height)
 player2 = pygame.Rect(screen.get_width() - paddle_dist - paddle_width, screen.get_height() // 2 - paddle_height // 2, paddle_width, paddle_height)
 
+# Scores
+player1_score = 0
+player2_score = 0
+
 def reset():
     global ball_centre, ball_angle, ball_speed, game_over, player1, player2
     ball_centre = [screen.get_width() // 2, screen.get_height() // 2]
@@ -94,8 +98,10 @@ while True:
 
     # Scoring system
     if ball_rect.left <= 0:
+        player2_score += 1
         game_over = True
     elif ball_rect.right >= screen.get_width():
+        player1_score += 1
         game_over = True
 
     # Rendering
@@ -103,6 +109,10 @@ while True:
     pygame.draw.circle(screen, "red", ball_centre, ball_radius)
     pygame.draw.rect(screen, "blue", player1)
     pygame.draw.rect(screen, "green", player2)
+
+    # Display scores
+    score_text = font.render(f"{player1_score}  -  {player2_score}", True, "white")
+    screen.blit(score_text, [(screen.get_width() // 2) - 20, 20])
 
     # Update Screen
     pygame.display.flip()
