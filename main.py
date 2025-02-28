@@ -18,7 +18,6 @@ player_speed = 5
 player1 = pygame.Rect(paddle_dist, screen.get_height() // 2 - paddle_height // 2, paddle_width, paddle_height)
 player2 = pygame.Rect(screen.get_width() - paddle_dist - paddle_width, screen.get_height() // 2 - paddle_height // 2, paddle_width, paddle_height)
 
-
 while True:
     # Event handling
     for event in pygame.event.get():
