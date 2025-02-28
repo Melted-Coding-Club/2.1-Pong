@@ -8,6 +8,17 @@ pygame.display.set_caption('Pong')
 clock = pygame.time.Clock()
 fps = 60
 
+# Paddle settings
+paddle_width = 10
+paddle_height = 90
+paddle_dist = 30
+
+# Player settings
+player_speed = 5
+player1 = pygame.Rect(paddle_dist, screen.get_height() // 2 - paddle_height // 2, paddle_width, paddle_height)
+player2 = pygame.Rect(screen.get_width() - paddle_dist - paddle_width, screen.get_height() // 2 - paddle_height // 2, paddle_width, paddle_height)
+
+
 while True:
     # Event handling
     for event in pygame.event.get():
@@ -17,6 +28,8 @@ while True:
 
     # Rendering
     screen.fill("black")
+    pygame.draw.rect(screen, "blue", player1)
+    pygame.draw.rect(screen, "green", player2)
 
     # Update Screen
     pygame.display.flip()
