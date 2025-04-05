@@ -39,7 +39,7 @@ def reset():
     ball_angle = random.choice([math.radians(random.randint(-45, 45)), math.radians(random.randint(135, 225))])
     player1.topleft = (paddle_dist, screen.get_height() // 2 - paddle_height // 2)
     player2.topleft = (screen.get_width() - paddle_dist, screen.get_height() // 2 - paddle_height // 2)
-    game_over = False
+    return False
 
 
 game_over = False
@@ -50,7 +50,7 @@ while True:
                 pygame.quit()
                 quit()
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                reset()
+                game_over = reset()
         over_msg = font.render("Game Over", True, "red")
         screen.blit(over_msg, [(screen.get_width() // 2) - (over_msg.get_width() // 2), (screen.get_height() // 2) - (over_msg.get_height() // 2)])
         pygame.display.flip()
